@@ -30,7 +30,7 @@ struct RunCard: View {
                 Spacer()
                 
                 VStack(alignment: .leading){
-                    Text("\(pace.format2F()) min/Km")
+                    Text("\(pace.toMinutesSeconds()) min/Km")
                         .font(.footnote)
                     Spacer()
                     Text(date, format: Date.FormatStyle(date: .abbreviated))

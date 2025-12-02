@@ -14,6 +14,6 @@ struct TrainingGraphsApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: Run.self)
+        .modelContainer(for: [Run.self])
     }
 }

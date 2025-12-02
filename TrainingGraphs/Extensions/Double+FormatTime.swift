@@ -21,4 +21,10 @@ extension Double {
         
         return String(format: "%02dh%02dm", hours, minutes)
     }
+    
+    func toMinutesSeconds() -> String {
+            let minutes = Int(self)
+            let seconds = Int((self - Double(minutes)) * 60)
+            return String(format: "%02d:%02d", minutes, seconds)
+        }
 }
