@@ -12,40 +12,43 @@ import Charts
 
 struct GraphView: View {
     @Environment(\.modelContext) private var context
+    
+//    @Query(sort: \Run.date) private var allRuns: [Run]
     // Em produção, use @Query. Para teste, use o mock:
     let allRuns = Run.mockArrayRuns()
     
     @StateObject var vm = GraphViewModel()
+    
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
     
     var body: some View {
-        // Obter os dados filtrados pela ViewModel
         let currentRuns = vm.filteredRuns(allRuns)
         
         ScrollView {
-            VStack(spacing: 32) { // Aumentei um pouco o espaçamento
+            VStack(spacing: 32) {
                 Text("Graphs")
                     .font(.title)
                     .bold()
                     .foregroundStyle(.opacity(0.5))
                 
                 
-                // 1. Picker de Intervalo (7D, 1M, etc)
-                Picker("Time Range", selection: $vm.selectedTimeRange) {
-                    ForEach(GraphTimeRange.allCases) { range in
-                        Text(range.rawValue).tag(range)
+                VStack(spacing: 24){
+                    //MARK: - Intervals
+                    Picker("Time Range", selection: $vm.selectedTimeRange) {
+                        ForEach(GraphTimeRange.allCases) { range in
+                            Text(range.rawValue).tag(range)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    
+                    //MARK: - Date Navigator
+                    DateRangeStepper(vm: vm)
+                    
+                    //MARK: - Unit Selector
+                    unitSelector
                 }
-                .pickerStyle(.segmented)
                 
-                // 2. O Stepper de Data (Navegação)
-                DateRangeStepper(vm: vm)
-                
-                // 3. Seletor de Unidade (Distância, Tempo, Pace)
-                // (Mudei levemente para ViewThatFits para não quebrar em telas pequenas)
-                unitSelector
-                
-                // 4. O Gráfico
+                //MARK: - Graph
                 if currentRuns.isEmpty {
                     ContentUnavailableView("No runs in this period", systemImage: "chart.xyaxis.line")
                         .frame(height: 280)
@@ -53,7 +56,7 @@ struct GraphView: View {
                     chartView(runs: currentRuns)
                 }
                 
-                // 5. Stats
+                //MARK: - Stats
                 statsSection(runs: currentRuns)
             }
             .padding()
@@ -65,26 +68,35 @@ struct GraphView: View {
     var unitSelector: some View {
         HStack(spacing: 12) {
             ForEach(RunUnits.allCases, id: \.self) { unit in
-                Button {
-                    withAnimation { vm.selectedRunUnit = unit }
-                } label: {
-                    HStack(spacing: 6) {
-                        Circle().fill(unit.color).frame(width: 6, height: 6)
-                        Text(unit.rawValue).font(.subheadline.weight(.medium))
+                Button{
+                    withAnimation() {
+                        vm.selectedRunUnit = unit
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
+                } label: {
+                    HStack(spacing: 8){
+                        Circle()
+                            .fill(unit.color)
+                            .frame(width: 8, height: 8)
+                        
+                        Text(unit.rawValue)
+                            .font(.subheadline.weight(.medium))
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
                     .background(vm.selectedRunUnit == unit ? unit.color.opacity(0.2) : Color(.systemGray6))
                     .cornerRadius(20)
                     .overlay(
                         RoundedRectangle(cornerRadius: 20)
-                            .stroke(vm.selectedRunUnit == unit ? unit.color : Color.clear, lineWidth: 2)
+                            .stroke(
+                                vm.selectedRunUnit == unit ? unit.color : Color.clear,
+                                lineWidth: 2
+                            )
                     )
                 }
                 .buttonStyle(.plain)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading) // Alinha a esquerda
+        .padding(.horizontal, 4)
     }
     
     func chartView(runs: [Run]) -> some View {

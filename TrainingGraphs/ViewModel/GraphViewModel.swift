@@ -18,7 +18,7 @@ class GraphViewModel: ObservableObject {
     //MARK: - Funcs
     // Variável computada que filtra as corridas baseado na janela de tempo
         func filteredRuns(_ runs: [Run]) -> [Run] {
-            let calendar = Calendar.current
+//            let calendar = Calendar.current
             guard let startDate = getStartDate() else { return [] }
             
             // Filtra corridas que estão entre startDate e referenceDate

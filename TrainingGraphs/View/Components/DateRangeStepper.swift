@@ -16,7 +16,8 @@ struct DateRangeStepper: View {
                 vm.moveTimeRange(direction: -1)
             } label: {
                 Image(systemName: "chevron.left")
-                    .padding()
+                    .font(.subheadline)
+                    .padding(12)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -24,7 +25,7 @@ struct DateRangeStepper: View {
             Spacer()
             
             Text(vm.getDateRangeLabel())
-                .font(.headline)
+                .font(.subheadline)
                 .monospacedDigit()
                 .animation(.none, value: vm.referenceDate) // Evita animação estranha no texto
             
@@ -34,7 +35,8 @@ struct DateRangeStepper: View {
                 vm.moveTimeRange(direction: 1)
             } label: {
                 Image(systemName: "chevron.right")
-                    .padding()
+                    .font(.subheadline)
+                    .padding(12)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
