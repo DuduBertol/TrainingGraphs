@@ -12,7 +12,8 @@ import SwiftData
 struct TrainingGraphsApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+//            ContentView()
+            GraphView()
         }
         .modelContainer(for: [Run.self])
     }

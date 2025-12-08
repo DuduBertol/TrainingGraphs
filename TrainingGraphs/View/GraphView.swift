@@ -13,72 +13,105 @@ import Charts
 struct GraphView: View {
     @Environment(\.modelContext) private var context
     
-    //    @Query(sort: \Run.date) private var allRuns: [Run]
+        @Query(sort: \Run.date) private var allRuns: [Run]
     // Em produção, use @Query. Para teste, use o mock:
-    let allRuns = Run.mockArrayRuns()
+//    let allRuns = Run.mockArrayRuns()
     
     @StateObject var vm = GraphViewModel()
+    
+    @State var isOpenNewRunSheet: Bool = false
+    @State var isOpenHistorySheet: Bool = false
     
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
     
     var body: some View {
         let currentRuns = vm.filteredRuns(allRuns)
         
-        ScrollView {
-            VStack(spacing: 32) {
-                Text("Graphs")
-                    .font(.title)
-                    .bold()
-                    .foregroundStyle(.opacity(0.5))
-                    .accessibilityAddTraits(.isHeader)
-                
-                
-                VStack(spacing: 24){
-                    //MARK: - Intervals
-                    Picker("Time Range", selection: $vm.selectedTimeRange) {
-                        ForEach(GraphTimeRange.allCases) { range in
-                            Text(range.rawValue).tag(range)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityLabel("Time Interval")
+        NavigationStack{
+            ScrollView {
+                VStack(spacing: 32) {
+                    Text("Run Charts")
+                        .font(.title)
+                        .bold()
+                        .foregroundStyle(.opacity(0.5))
+                        .accessibilityAddTraits(.isHeader)
                     
-                    //MARK: - Date Navigator
-                    DateRangeStepper(vm: vm)
-                        .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("Selected Period")
-                        .accessibilityValue(vm.getDateRangeLabel())
-                        .accessibilityAdjustableAction { direction in
-                            switch direction {
-                            case .increment:
-                                vm.moveTimeRange(direction: 1)
-                            case .decrement:
-                                vm.moveTimeRange(direction: -1)
-                            @unknown default:
-                                break
+                    
+                    VStack(spacing: 24){
+                        //MARK: - Intervals
+                        Picker("Time Range", selection: $vm.selectedTimeRange) {
+                            ForEach(GraphTimeRange.allCases) { range in
+                                Text(range.rawValue).tag(range)
                             }
                         }
-                        .accessibilityHint("Swipe up or down to change the period")
+                        .pickerStyle(.segmented)
+                        .accessibilityLabel("Time Interval")
+                        
+                        //MARK: - Date Navigator
+                        DateRangeStepper(vm: vm)
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("Selected Period")
+                            .accessibilityValue(vm.getDateRangeLabel())
+                            .accessibilityAdjustableAction { direction in
+                                switch direction {
+                                case .increment:
+                                    vm.moveTimeRange(direction: 1)
+                                case .decrement:
+                                    vm.moveTimeRange(direction: -1)
+                                @unknown default:
+                                    break
+                                }
+                            }
+                            .accessibilityHint("Swipe up or down to change the period")
+                        
+                        //MARK: - Unit Selector
+                        unitSelector
+                    }
                     
-                    //MARK: - Unit Selector
-                    unitSelector
+                    //MARK: - Graph
+                    if currentRuns.isEmpty {
+                        ContentUnavailableView("No runs in this period", systemImage: "chart.xyaxis.line")
+                            .frame(height: 280)
+                    } else {
+                        chartView(runs: currentRuns)
+                            .accessibilityLabel("Evolution graph by \(vm.selectedRunUnit.rawValue)")
+                            .accessibilityHint("Shows data for \(vm.getDateRangeLabel())")
+                    }
+                    
+                    //MARK: - Stats
+                    statsSection(runs: currentRuns)
                 }
-                
-                //MARK: - Graph
-                if currentRuns.isEmpty {
-                    ContentUnavailableView("No runs in this period", systemImage: "chart.xyaxis.line")
-                        .frame(height: 280)
-                } else {
-                    chartView(runs: currentRuns)
-                        .accessibilityLabel("Evolution graph by \(vm.selectedRunUnit.rawValue)")
-                        .accessibilityHint("Shows data for \(vm.getDateRangeLabel())")
-                }
-                
-                //MARK: - Stats
-                statsSection(runs: currentRuns)
+                .padding()
             }
-            .padding()
+//            .navigationTitle("Run Charts")
+//            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isOpenNewRunSheet = true
+                    }label: {
+                        Image(systemName: "plus")
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isOpenHistorySheet = true
+                    }label: {
+                        Image(systemName: "clock")
+                    }
+                }
+            }
+            
+            .sheet(isPresented: $isOpenNewRunSheet) {
+                NewRunView()
+            }
+            .sheet(isPresented: $isOpenHistorySheet) {
+                HistoryView()
+            }
+            
         }
+        
+        
     }
     
     // MARK: - Subviews

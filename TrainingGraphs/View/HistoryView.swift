@@ -11,8 +11,8 @@ import SwiftData
 struct HistoryView: View {
     
     @Environment(\.modelContext) private var context
-//    @Query(sort: \Run.date, order: .reverse) private var runs: [Run]
-    let runs = Run.mockArrayRuns()
+    @Query(sort: \Run.date, order: .reverse) private var runs: [Run]
+//    let runs = Run.mockArrayRuns()
     
     @State private var selectedRun: Run?
     
@@ -76,46 +76,54 @@ struct HistoryView: View {
                             showDeleteRunAlert = true
                         }
                     }
+                    
+                    Spacer()
+                    
+                    deleteAllButton()
                 }
-                .scrollContentBackground(.hidden)
-                .listStyle(.plain)
+//                .scrollContentBackground(.hidden)
+//                .listStyle(.plain)
                 .sheet(item: $selectedRun) { run in
                     EditRunView(run: run)
                 }
                 
 
                 
-                HStack{
-                    Spacer()
-                    Button(role: .destructive) {
-                        showDeleteAllRunsAlert = true
-                    } label: {
-                        Text("Delete all runs")
-                    }
-                    .confirmationDialog("Are you sure you want to delete all runs?",
-                                        isPresented: $showDeleteAllRunsAlert,
-                                        titleVisibility: .visible) {
-                        Button("Delete All Runs", role: .destructive) {
-                            do {
-                                try context.delete(model: Run.self)
-                                try context.save()
-                                
-                                showConfirmDeleteDialog = true
-                            } catch {
-                                print("Erro ao deletar os dados: \(error)")
-                            }
-                        }
-                        .alert("Successfully Deleted All Runs!", isPresented: $showConfirmDeleteDialog) {}
-                        
-                    } message: {
-                        Text("This action is permanent and cannot be undone.")
-                    }
-                    
-                    
-                    Spacer()
-                }
+                
             }
             .padding(.bottom, 32)
+        }
+    }
+    
+    func deleteAllButton() -> some View{
+        HStack{
+            Spacer()
+            Button(role: .destructive) {
+                showDeleteAllRunsAlert = true
+            } label: {
+                Text("Delete all runs")
+            }
+            .confirmationDialog("Are you sure you want to delete all runs?",
+                                isPresented: $showDeleteAllRunsAlert,
+                                titleVisibility: .visible) {
+                Button("Delete All Runs", role: .destructive) {
+                    do {
+                        try context.delete(model: Run.self)
+                        try context.save()
+                        
+                        showConfirmDeleteDialog = true
+                    } catch {
+                        print("Erro ao deletar os dados: \(error)")
+                    }
+                }
+                .alert("Successfully Deleted All Runs!", isPresented: $showConfirmDeleteDialog) {}
+                
+            } message: {
+                Text("This action is permanent and cannot be undone.")
+            }
+            
+            
+            Spacer()
         }
     }
 }

@@ -120,6 +120,7 @@ struct EditRunView: View {
             }
             .navigationTitle("Edit Run")
             .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {

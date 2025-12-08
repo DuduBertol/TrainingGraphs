@@ -16,6 +16,10 @@ extension Double {
     }
     
     func formatTimeHourMin() -> String {
+        guard self.isFinite, !self.isNaN else {
+            return "00:00" // Valor padrão seguro
+        }
+        
         let hours = Int(self) / 60
         let minutes = Int(self) % 60
         

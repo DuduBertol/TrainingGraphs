@@ -25,24 +25,24 @@ struct RunCard: View {
             }
             
             
-            HStack(spacing: 8){
-                Spacer()
+            HStack(spacing: 24){
+//                Spacer()
                 
                 Text("\(distanceKm.format2F()) Km")
                     .font(.title)
                     .bold()
                 
-                Spacer()
+//                Spacer()
                 
                 Text("\(durationMin) min")
                     .font(.title2)
                 
-                Spacer()
+//                Spacer()
                 
                 Text("\(pace.toMinutesSeconds()) min/Km")
                     .font(.footnote)
                 
-                Spacer()
+//                Spacer()
                 
             }
         }

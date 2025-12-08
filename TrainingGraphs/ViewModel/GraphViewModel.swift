@@ -109,6 +109,8 @@ class GraphViewModel: ObservableObject {
     
     
     func calculateAverage(for runs: [Run]) -> String {
+        guard !runs.isEmpty else { return getValueForMetric(0) }
+        
         let values = runs.map { selectedRunUnit.value(of: $0) }
         let average = values.reduce(0, +) / Double(values.count)
         
@@ -117,6 +119,7 @@ class GraphViewModel: ObservableObject {
     }
     
     func calculateBest(for runs: [Run]) -> String {
+        guard !runs.isEmpty else { return getValueForMetric(0) }
         
         let values = runs.map { selectedRunUnit.value(of: $0) }
         let best: Double
@@ -131,6 +134,8 @@ class GraphViewModel: ObservableObject {
     }
     
     func calculateLast(for runs: [Run]) -> String {
+        guard !runs.isEmpty else { return getValueForMetric(0) }
+
         guard let last = runs.last else { return "N/A" }
         let lastValue = selectedRunUnit.value(of: last)
         
