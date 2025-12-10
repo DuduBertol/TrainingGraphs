@@ -11,8 +11,8 @@ import SwiftData
 struct HistoryView: View {
     
     @Environment(\.modelContext) private var context
-//    @Query(sort: \Run.date, order: .reverse) private var runs: [Run]
-    let runs = Run.mockArrayRuns()
+    @Query(sort: \Run.date, order: .reverse) private var runs: [Run]
+//    let runs = Run.mockArrayRuns()
     
     @State private var selectedRun: Run?
     
